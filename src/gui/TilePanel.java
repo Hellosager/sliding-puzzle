@@ -3,27 +3,35 @@ package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+
+import utils.ImageScaler;
 
 public class TilePanel extends JPanel {
 	private int tileWidht, tileHeight;
 	private BufferedImage tiles[][];
 
-	public TilePanel(final BufferedImage srcPic, int widthTiles, int heightTiles) {
+	public TilePanel(BufferedImage srcPic, int widthTiles, int heightTiles) {
 		tiles = new BufferedImage[widthTiles][heightTiles];
-		int srcPicWidth = srcPic.getWidth();
-		int srcPicHeight = srcPic.getHeight();
+		BufferedImage fittingPic = scaleImageIfNecassary(srcPic);
+
+
+		int srcPicWidth = fittingPic.getWidth();
+		int srcPicHeight = fittingPic.getHeight();
 		tileWidht = roundDown(srcPicWidth, widthTiles);
 		tileHeight = roundDown(srcPicHeight, heightTiles);
 		setPreferredSize(new Dimension(tileWidht * widthTiles, tileHeight * heightTiles));
 
 		for (int i = 0; i < tiles.length; i++) {
 			for (int j = 0; j < tiles[i].length; j++) {
-				tiles[i][j] = srcPic.getSubimage(i * tileWidht, j * tileHeight, tileWidht, tileHeight);
+				tiles[i][j] = fittingPic.getSubimage(i * tileWidht, j * tileHeight, tileWidht, tileHeight);
 			}
 		}
 	}
@@ -33,6 +41,16 @@ public class TilePanel extends JPanel {
 			return srcPicEdgeLength / count;
 		} else {
 			return (srcPicEdgeLength - (srcPicEdgeLength % count)) / count;
+		}
+	}
+
+	private BufferedImage scaleImageIfNecassary(BufferedImage srcPic) {
+		ImageScaler is = new ImageScaler();
+		if(!is.isDimensionFittingInScreen(srcPic.getWidth(), srcPic.getHeight())) {
+			Dimension fitScreen = is.getDimensionFitOnScreen(srcPic.getWidth(), srcPic.getHeight());
+			return is.scaleImageToDimension(srcPic, fitScreen);
+		}else {
+			return srcPic;
 		}
 	}
 

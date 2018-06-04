@@ -1,23 +1,31 @@
 package controller;
 
+import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import gui.GameFrame;
+import gui.MainPanel;
 
-public class ImagePreviewListener implements MouseListener {
+public class ImagePreviewListener extends MouseAdapter {
 	private JLabel preview;
 	private GameFrame gf;
+	private MainPanel mp;
+	private double screenWidth, screenHeight;
 	
-	
-	
-	public ImagePreviewListener(JLabel preview, GameFrame gf) {
+	public ImagePreviewListener(JLabel preview, GameFrame gf, MainPanel mp) {
 		this.preview = preview;
 		this.gf = gf;
+		this.mp = mp;
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		screenWidth = screenSize.getWidth();
+		screenHeight = screenSize.getHeight();
 	}
 
 	@Override
@@ -25,34 +33,25 @@ public class ImagePreviewListener implements MouseListener {
 		FileDialog fd = new FileDialog(gf.getFrame(), "Load Picture" ,FileDialog.LOAD);
 		fd.setDirectory("C:\\");
 		fd.setVisible(true);
-		String filename = fd.getFile();
-		String filePath = fd.getDirectory();
-		System.out.println(filePath + filename);
-		preview.setIcon(new ImageIcon(filePath + filename));
-		preview.setText(null);
-		preview.setPreferredSize(null);
-		gf.getFrame().pack();
-		gf.getFrame().setLocationRelativeTo(null);
+		if(fd.getFile() != null) {
+			String file = fd.getDirectory() + fd.getFile();
+			mp.setCurrentPicturePath(file);
+			ImageIcon icon = new ImageIcon(file);
+			int iconHeight = icon.getIconHeight();
+			int iconWidth = icon.getIconWidth();
+			if(iconHeight > screenHeight || iconWidth > screenWidth) {
+				while(iconHeight > screenHeight || iconWidth > screenWidth) {
+					iconHeight = iconHeight/2;
+					iconWidth = iconWidth/2;
+				}
+				Image image = icon.getImage();
+				icon = new ImageIcon(image.getScaledInstance(iconWidth, iconHeight, Image.SCALE_SMOOTH));
+			}
+			preview.setIcon(icon);
+			preview.setText(null);
+			preview.setPreferredSize(null);
+			gf.getFrame().pack();
+			gf.getFrame().setLocationRelativeTo(null);
+		}
 	}
-
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-
-	}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-
-	}
-
 }
