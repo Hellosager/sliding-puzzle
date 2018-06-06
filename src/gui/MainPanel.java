@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -51,11 +52,12 @@ public class MainPanel extends JPanel{
 				try {
 					picture = ImageIO.read(new File(currentPicturePath));
 					TilePanel tp = new TilePanel(picture, tileCount, tileCount);
-					gf.getFrame().getContentPane().removeAll();
-					gf.getFrame().add(tp);
-					gf.getFrame().revalidate();
-					gf.getFrame().repaint();
-					gf.getFrame().pack();
+					JFrame frame = gf.getFrame();
+					frame.getContentPane().removeAll();
+					frame.add(tp);
+					frame.revalidate();
+					frame.repaint();
+					frame.pack();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}

@@ -12,16 +12,17 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import controller.TileClickListener;
+import controller.TilePushListener;
 import utils.ImageScaler;
 
 public class TilePanel extends JPanel {
 	private int tileWidht, tileHeight;
-	private BufferedImage tiles[][];
+	private Tile tiles[][];
 
 	public TilePanel(BufferedImage srcPic, int widthTiles, int heightTiles) {
-		tiles = new BufferedImage[widthTiles][heightTiles];
+		tiles = new Tile[widthTiles][heightTiles];
 		BufferedImage fittingPic = scaleImageIfNecassary(srcPic);
-
 
 		int srcPicWidth = fittingPic.getWidth();
 		int srcPicHeight = fittingPic.getHeight();
@@ -31,9 +32,16 @@ public class TilePanel extends JPanel {
 
 		for (int i = 0; i < tiles.length; i++) {
 			for (int j = 0; j < tiles[i].length; j++) {
-				tiles[i][j] = fittingPic.getSubimage(i * tileWidht, j * tileHeight, tileWidht, tileHeight);
+				int x = i * tileWidht;
+				int y = j * tileHeight;
+				tiles[i][j] = new Tile(fittingPic.getSubimage(x, y, tileWidht, tileHeight), x, y);
 			}
 		}
+		tiles[widthTiles - 1][0] = null;
+
+		TilePushListener tpl = new TilePushListener(this);
+		addMouseListener(new TileClickListener(tpl, tileWidht, tileHeight, tiles));
+		addMouseMotionListener(tpl);
 	}
 
 	private int roundDown(int srcPicEdgeLength, int count) {
@@ -46,10 +54,10 @@ public class TilePanel extends JPanel {
 
 	private BufferedImage scaleImageIfNecassary(BufferedImage srcPic) {
 		ImageScaler is = new ImageScaler();
-		if(!is.isDimensionFittingInScreen(srcPic.getWidth(), srcPic.getHeight())) {
+		if (!is.isDimensionFittingInScreen(srcPic.getWidth(), srcPic.getHeight())) {
 			Dimension fitScreen = is.getDimensionFitOnScreen(srcPic.getWidth(), srcPic.getHeight());
 			return is.scaleImageToDimension(srcPic, fitScreen);
-		}else {
+		} else {
 			return srcPic;
 		}
 	}
@@ -59,7 +67,8 @@ public class TilePanel extends JPanel {
 		super.paintComponent(g);
 		for (int i = 0; i < tiles.length; i++) {
 			for (int j = 0; j < tiles[i].length; j++) {
-				g.drawImage(tiles[i][j], i * tileWidht, j * tileHeight, null);
+				if(tiles[i][j] != null)
+					g.drawImage(tiles[i][j].getImage(), tiles[i][j].getX(), tiles[i][j].getY(), null);
 			}
 		}
 		g.setColor(Color.RED);
