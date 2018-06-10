@@ -35,12 +35,16 @@ public class TilePanel extends JPanel {
 				int x = i * tileWidht;
 				int y = j * tileHeight;
 				tiles[i][j] = new Tile(fittingPic.getSubimage(x, y, tileWidht, tileHeight), x, y);
+				tiles[i][j].setMoveState(Tile.NOT_MOVEABLE);
 			}
 		}
 		tiles[widthTiles - 1][0] = null;
+		tiles[1][0].setMoveState(Tile.X_MOVEABLE);
+		tiles[2][1].setMoveState(Tile.Y_MOVEABLE);
 
-		TilePushListener tpl = new TilePushListener(this);
-		addMouseListener(new TileClickListener(tpl, tileWidht, tileHeight, tiles));
+
+		TilePushListener tpl = new TilePushListener(this, tileWidht, tileHeight, tiles);
+		addMouseListener(new TileClickListener(tpl, this, tiles));
 		addMouseMotionListener(tpl);
 	}
 
@@ -67,8 +71,9 @@ public class TilePanel extends JPanel {
 		super.paintComponent(g);
 		for (int i = 0; i < tiles.length; i++) {
 			for (int j = 0; j < tiles[i].length; j++) {
-				if(tiles[i][j] != null)
+				if(tiles[i][j] != null) {
 					g.drawImage(tiles[i][j].getImage(), tiles[i][j].getX(), tiles[i][j].getY(), null);
+				}
 			}
 		}
 		g.setColor(Color.RED);
@@ -80,5 +85,13 @@ public class TilePanel extends JPanel {
 		while ((j += tileHeight) < getHeight()) {
 			g.drawLine(0, j, getWidth(), j);
 		}
+	}
+	
+	public int getTileWidth() {
+		return tileWidht;
+	}
+	
+	public int getTileHeight() {
+		return tileHeight;
 	}
 }
