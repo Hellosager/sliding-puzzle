@@ -38,9 +38,9 @@ public class TilePanel extends JPanel {
 				tiles[i][j].setMoveState(Tile.NOT_MOVEABLE);
 			}
 		}
-		tiles[widthTiles - 1][0] = null;
-		tiles[1][0].setMoveState(Tile.X_MOVEABLE);
-		tiles[2][1].setMoveState(Tile.Y_MOVEABLE);
+		tiles[widthTiles - 1][0] = null;	// dynamic moveable sets around empty tile
+		tiles[widthTiles - 2][0].setMoveState(Tile.X_MOVEABLE);
+		tiles[widthTiles-1][1].setMoveState(Tile.Y_MOVEABLE);
 
 
 		TilePushListener tpl = new TilePushListener(this, tileWidht, tileHeight, tiles);
