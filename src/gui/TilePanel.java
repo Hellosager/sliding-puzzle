@@ -8,6 +8,8 @@ import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -18,10 +20,12 @@ import utils.ImageScaler;
 
 public class TilePanel extends JPanel {
 	private int tileWidht, tileHeight;
-	private Tile tiles[][];
+	private Tile originalTiles[][];
+	private Tile mixedTiles[][];
 
 	public TilePanel(BufferedImage srcPic, int widthTiles, int heightTiles) {
-		tiles = new Tile[widthTiles][heightTiles];
+		originalTiles = new Tile[widthTiles][heightTiles];
+		ArrayList<Tile> tileList = new ArrayList<Tile>();
 		BufferedImage fittingPic = scaleImageIfNecassary(srcPic);
 
 		int srcPicWidth = fittingPic.getWidth();
@@ -30,22 +34,99 @@ public class TilePanel extends JPanel {
 		tileHeight = roundDown(srcPicHeight, heightTiles);
 		setPreferredSize(new Dimension(tileWidht * widthTiles, tileHeight * heightTiles));
 
-		for (int i = 0; i < tiles.length; i++) {
-			for (int j = 0; j < tiles[i].length; j++) {
+		for (int i = 0; i < originalTiles.length; i++) {
+			for (int j = 0; j < originalTiles[i].length; j++) {
 				int x = i * tileWidht;
 				int y = j * tileHeight;
-				tiles[i][j] = new Tile(fittingPic.getSubimage(x, y, tileWidht, tileHeight), x, y);
-				tiles[i][j].setMoveState(Tile.NOT_MOVEABLE);
+				originalTiles[i][j] = new Tile(fittingPic.getSubimage(x, y, tileWidht, tileHeight), x, y,
+						(i + 1) * (j + 1));
+				originalTiles[i][j].setMoveState(Tile.NOT_MOVEABLE);
 			}
 		}
-		tiles[widthTiles - 1][0] = null;	// dynamic moveable sets around empty tile
-		tiles[widthTiles - 2][0].setMoveState(Tile.X_MOVEABLE);
-		tiles[widthTiles-1][1].setMoveState(Tile.Y_MOVEABLE);
-
-
-		TilePushListener tpl = new TilePushListener(this, tileWidht, tileHeight, tiles);
-		addMouseListener(new TileClickListener(tpl, this, tiles));
+		originalTiles[widthTiles - 1][0] = null; // dynamic moveable sets around empty tile
+		mixedTiles = mixTiles(originalTiles);
+		TilePushListener tpl = new TilePushListener(this, tileWidht, tileHeight, mixedTiles);
+		addMouseListener(new TileClickListener(tpl, this, mixedTiles, originalTiles));
 		addMouseMotionListener(tpl);
+	}
+
+	private Tile[][] mixTiles(Tile[][] originalTiles) {
+		Random r = new Random(); // für die richtung
+		Tile[][] workingMixedTiles = new Tile[originalTiles.length][originalTiles[0].length];
+		for (int x = 0; x < originalTiles.length; x++) { // Copy array
+			for (int y = 0; y < originalTiles[x].length; y++) {
+				workingMixedTiles[x][y] = originalTiles[x][y];
+			}
+		}
+		int nullTileX = originalTiles.length - 1;
+		int nullTileY = 0;
+		int newNullTileX = nullTileX;
+		int newNullTileY = nullTileY;
+		int moves = 0;
+		int previousMove = 88;
+		int maxMoves = workingMixedTiles.length * 100;
+		while (tilesSetEqually(originalTiles, workingMixedTiles) > 0 && moves < maxMoves) { // solange austauschen bis
+																							// weniger als 2 gleiche
+			nullTileX = newNullTileX;
+			nullTileY = newNullTileY;
+			while (newNullTileX == nullTileX && newNullTileY == nullTileY) { // solange kein move gefunden wurde
+				int move = r.nextInt(4);
+				switch (move) {
+				case 0: // links
+					if (previousMove != 1 && nullTileX - 1 >= 0) {
+						newNullTileX = nullTileX - 1; // neue Koordinate von nullTile
+					}
+					break;
+				case 1: // rechts
+					if (previousMove != 0 && nullTileX + 1 <= workingMixedTiles.length - 1) {
+						newNullTileX = nullTileX + 1; // neue Koordinate von nullTile
+					}
+					break;
+				case 2: // oben
+					if (previousMove != 3 && nullTileY - 1 >= 0) {
+						newNullTileY = nullTileY - 1; // neue Koordinate von nullTile
+					}
+					break;
+				case 3: // unten
+					if (previousMove != 2 && nullTileY + 1 <= workingMixedTiles[nullTileX].length - 1)
+						newNullTileY = nullTileY + 1; // neue Koordinate von nullTile
+					break;
+				}
+				if (nullTileX != newNullTileX || nullTileY != newNullTileY) {
+					moves++;
+					previousMove = move;
+					workingMixedTiles[nullTileX][nullTileY] = workingMixedTiles[newNullTileX][newNullTileY];
+					workingMixedTiles[newNullTileX][newNullTileY] = null;
+					workingMixedTiles[nullTileX][nullTileY].setX(nullTileX * tileWidht);
+					workingMixedTiles[nullTileX][nullTileY].setY(nullTileY * tileHeight);
+				}
+			}
+		}
+
+		if (newNullTileX - 1 >= 0)
+			workingMixedTiles[newNullTileX - 1][newNullTileY].setMoveState(Tile.X_MOVEABLE);
+		if (newNullTileX + 1 <= workingMixedTiles.length - 1)
+			workingMixedTiles[newNullTileX + 1][newNullTileY].setMoveState(Tile.X_MOVEABLE);
+		if (newNullTileY - 1 >= 0)
+			workingMixedTiles[newNullTileX][newNullTileY - 1].setMoveState(Tile.Y_MOVEABLE);
+		if (newNullTileY + 1 <= workingMixedTiles[newNullTileX].length - 1)
+			workingMixedTiles[newNullTileX][newNullTileY + 1].setMoveState(Tile.Y_MOVEABLE);
+
+		return workingMixedTiles;
+	}
+
+	private int tilesSetEqually(Tile[][] originalTiles, Tile[][] mixedTiles) {
+		int equalTiles = 0;
+		for (int x = 0; x < originalTiles.length; x++) {
+			for (int y = 0; y < originalTiles[x].length; y++) {
+				Tile originalTile = originalTiles[x][y];
+				Tile mixedTile = mixedTiles[x][y];
+				if (originalTile != null && mixedTile != null
+						&& originalTiles[x][y].getID() == mixedTiles[x][y].getID())
+					equalTiles++;
+			}
+		}
+		return equalTiles;
 	}
 
 	private int roundDown(int srcPicEdgeLength, int count) {
@@ -69,10 +150,10 @@ public class TilePanel extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		for (int i = 0; i < tiles.length; i++) {
-			for (int j = 0; j < tiles[i].length; j++) {
-				if(tiles[i][j] != null) {
-					g.drawImage(tiles[i][j].getImage(), tiles[i][j].getX(), tiles[i][j].getY(), null);
+		for (int i = 0; i < mixedTiles.length; i++) {
+			for (int j = 0; j < mixedTiles[i].length; j++) {
+				if (mixedTiles[i][j] != null) {
+					g.drawImage(mixedTiles[i][j].getImage(), mixedTiles[i][j].getX(), mixedTiles[i][j].getY(), null);
 				}
 			}
 		}
@@ -86,11 +167,11 @@ public class TilePanel extends JPanel {
 			g.drawLine(0, j, getWidth(), j);
 		}
 	}
-	
+
 	public int getTileWidth() {
 		return tileWidht;
 	}
-	
+
 	public int getTileHeight() {
 		return tileHeight;
 	}

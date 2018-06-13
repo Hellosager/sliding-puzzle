@@ -48,18 +48,6 @@ public class TilePushListener implements MouseMotionListener {
 					tp.repaint();
 				}
 			}
-			// System.out.println("checktileX: " + xCheckTile + " y: " + yCheckTile);
-			// if ((currentMovingTile.getMoveState() == Tile.X_MOVEABLE) && (xCheckTile <
-			// maxWidthIndex) && (mouseX >= 0)
-			// && (tiles[xCheckTile][staticTileYIndex] == null ||
-			// tiles[xCheckTile][staticTileYIndex] == currentMovingTile)) {
-			// }
-			// if ((currentMovingTile.getMoveState() == Tile.Y_MOVEABLE) && (yCheckTile <
-			// maxHeightIndex) && (mouseY >= 0)
-			// && (tiles[staticTileXIndex][yCheckTile] == null ||
-			// tiles[staticTileXIndex][yCheckTile] == currentMovingTile)) {
-			// currentMovingTile.setY(e.getY());
-			// }
 			tp.repaint();
 		}
 	}

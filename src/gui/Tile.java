@@ -11,12 +11,13 @@ public class Tile {
 	private int x, y;
 	private int moveState;
 	private boolean moveable;
+	private int id;
 	
-	public Tile(BufferedImage tilePic, int x, int y) {
+	public Tile(BufferedImage tilePic, int x, int y, int id) {
 		this.tilePic = tilePic;
 		this.x = x;
 		this.y = y;
-		moveState = X_MOVEABLE;
+		this.id = id;
 	}
 	
 	public BufferedImage getImage() {
@@ -53,5 +54,9 @@ public class Tile {
 	
 	public int getMoveState() {
 		return moveState;
+	}
+	
+	public int getID() {
+		return id;
 	}
 }
