@@ -17,20 +17,22 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import controller.ImagePreviewListener;
+import controller.PanelKeyListener;
+import main.Game;
 
 public class MainPanel extends JPanel{
-	private GameFrame gf;
+	private JFrame frame;
 	private JLabel imagePreview;
 	private String currentPicturePath;
 	private JTextField tileCountField;
 	private JButton startGame;
 	
-	public MainPanel(GameFrame gf) {
-		this.gf = gf;
+	public MainPanel(JFrame frame) {
+		this.frame = frame;
 		setLayout(new BorderLayout());
 		
 		imagePreview = new JLabel("Click", JLabel.CENTER);
-		imagePreview.addMouseListener(new ImagePreviewListener(imagePreview, gf, this));
+		imagePreview.addMouseListener(new ImagePreviewListener(imagePreview, frame, this));
 		imagePreview.setPreferredSize(new Dimension(350, 350));
 		add(imagePreview);
 		
@@ -40,21 +42,22 @@ public class MainPanel extends JPanel{
 		tileCountPanel.add(new JLabel("Tilecount: "));
 		tileCountPanel.add(tileCountField);
 		lowerPanel.add(tileCountPanel);
-		startGame = new JButton("Starg Game");
+		startGame = new JButton("Start Game");
 		lowerPanel.add(startGame);
 		add(lowerPanel, BorderLayout.SOUTH);
 		
 		startGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int tileCount = new Integer(tileCountField.getText());
+				int tileCount = new Integer(tileCountField.getText().trim());
 				BufferedImage picture;
 				try {
 					picture = ImageIO.read(new File(currentPicturePath));
 					TilePanel tp = new TilePanel(picture, tileCount, tileCount);
-					JFrame frame = gf.getFrame();
 					frame.getContentPane().removeAll();
+					tp.addKeyListener(new PanelKeyListener(tp, frame));
 					frame.add(tp);
+					tp.requestFocus();
 					frame.revalidate();
 					frame.repaint();
 					frame.pack();

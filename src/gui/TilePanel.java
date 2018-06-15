@@ -3,15 +3,9 @@ package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import controller.TileClickListener;
@@ -22,11 +16,14 @@ public class TilePanel extends JPanel {
 	private int tileWidht, tileHeight;
 	private Tile originalTiles[][];
 	private Tile mixedTiles[][];
+	private boolean showingOriginalPicture;
+	private boolean solved;
 
 	public TilePanel(BufferedImage srcPic, int widthTiles, int heightTiles) {
-		originalTiles = new Tile[widthTiles][heightTiles];
-		ArrayList<Tile> tileList = new ArrayList<Tile>();
+		this.originalTiles = new Tile[widthTiles][heightTiles];
 		BufferedImage fittingPic = scaleImageIfNecassary(srcPic);
+		this.showingOriginalPicture = false;
+		this.solved = false;
 
 		int srcPicWidth = fittingPic.getWidth();
 		int srcPicHeight = fittingPic.getHeight();
@@ -44,7 +41,7 @@ public class TilePanel extends JPanel {
 			}
 		}
 		originalTiles[widthTiles - 1][0] = null; // dynamic moveable sets around empty tile
-		mixedTiles = mixTiles(originalTiles);
+		this.mixedTiles = mixTiles(originalTiles);
 		TilePushListener tpl = new TilePushListener(this, tileWidht, tileHeight, mixedTiles);
 		addMouseListener(new TileClickListener(tpl, this, mixedTiles, originalTiles));
 		addMouseMotionListener(tpl);
@@ -55,7 +52,8 @@ public class TilePanel extends JPanel {
 		Tile[][] workingMixedTiles = new Tile[originalTiles.length][originalTiles[0].length];
 		for (int x = 0; x < originalTiles.length; x++) { // Copy array
 			for (int y = 0; y < originalTiles[x].length; y++) {
-				workingMixedTiles[x][y] = originalTiles[x][y];
+				Tile t = originalTiles[x][y];
+				workingMixedTiles[x][y] =  t == null ? null : new Tile(originalTiles[x][y]);
 			}
 		}
 		int nullTileX = originalTiles.length - 1;
@@ -150,21 +148,34 @@ public class TilePanel extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		for (int i = 0; i < mixedTiles.length; i++) {
-			for (int j = 0; j < mixedTiles[i].length; j++) {
-				if (mixedTiles[i][j] != null) {
-					g.drawImage(mixedTiles[i][j].getImage(), mixedTiles[i][j].getX(), mixedTiles[i][j].getY(), null);
+		if(!solved && !showingOriginalPicture) {
+			System.out.println("mixed");
+			for (int i = 0; i < mixedTiles.length; i++) {
+				for (int j = 0; j < mixedTiles[i].length; j++) {
+					if (mixedTiles[i][j] != null) {
+						g.drawImage(mixedTiles[i][j].getImage(), mixedTiles[i][j].getX(), mixedTiles[i][j].getY(), null);
+					}
 				}
 			}
-		}
-		g.setColor(Color.RED);
-		int i = 0;
-		int j = 0;
-		while ((i += tileWidht) < getWidth()) {
-			g.drawLine(i, 0, i, getHeight());
-		}
-		while ((j += tileHeight) < getHeight()) {
-			g.drawLine(0, j, getWidth(), j);
+			g.setColor(Color.RED);
+			int i = 0;
+			int j = 0;
+			while ((i += tileWidht) < getWidth()) {
+				g.drawLine(i, 0, i, getHeight());
+			}
+			while ((j += tileHeight) < getHeight()) {
+				g.drawLine(0, j, getWidth(), j);
+			}
+		}else {
+			System.out.println("orig paint");
+			for(int i = 0; i < originalTiles.length; i++) {
+				for(int j = 0; j < originalTiles[i].length; j++) {
+					if(originalTiles[i][j] != null) {
+						Tile tile = originalTiles[i][j];
+						g.drawImage(tile.getImage(), tile.getX(), tile.getY(), null);
+					}
+				}
+			}
 		}
 	}
 
@@ -174,5 +185,21 @@ public class TilePanel extends JPanel {
 
 	public int getTileHeight() {
 		return tileHeight;
+	}
+	
+	public boolean isShowingOriginalPicture() {
+		return showingOriginalPicture;
+	}
+	
+	public void setShowingOriginalPicture(boolean b) {
+		this.showingOriginalPicture = b;
+	}
+	
+	public boolean isSolved() {
+		return solved;
+	}
+	
+	public void setSolved(boolean b) {
+		this.solved = b;
 	}
 }

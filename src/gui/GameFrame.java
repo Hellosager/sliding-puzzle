@@ -14,13 +14,11 @@ public class GameFrame {
 	
 	
 	public GameFrame(BufferedImage originalPic) {
-//		tilePanel = new TilePanel(originalPic, 9, 9); // TODO HARDCODED
 		frame = new JFrame("Schieberätsel");
 		frame.setLayout(new BorderLayout());
-		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		frame.add(tilePanel);
-		frame.add(new MainPanel(this));
+		frame.setResizable(false);
+		frame.add(new MainPanel(frame));
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);

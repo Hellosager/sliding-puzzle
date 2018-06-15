@@ -25,30 +25,32 @@ public class TilePushListener implements MouseMotionListener {
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		// Nur, wenn möglich ist soll gzogen werden können
-		if (currentMovingTile != null) {
-			if (currentMovingTile.getMoveState() == Tile.X_MOVEABLE) {
-				int mouseX = e.getX();
-				int staticTileYIndex = currentMovingTile.getY() / tileHeight;
-				int offsetX = mouseX > currentMovingTile.getX() ? tileWidth : -1; // TODO das hier ist noch komisch
-				int xCheckTile = (mouseX + offsetX) / tileWidth;
-				if ((xCheckTile < maxWidthIndex) && (mouseX >= 0) && (tiles[xCheckTile][staticTileYIndex] == null
-						|| tiles[xCheckTile][staticTileYIndex] == currentMovingTile)) {
-					currentMovingTile.setX(e.getX());
-					tp.repaint();
+		if(!tp.isSolved() && !tp.isShowingOriginalPicture()) {
+			if (currentMovingTile != null) {
+				if (currentMovingTile.getMoveState() == Tile.X_MOVEABLE) {
+					int mouseX = e.getX();
+					int staticTileYIndex = currentMovingTile.getY() / tileHeight;
+					int offsetX = mouseX > currentMovingTile.getX() ? tileWidth : -1; // TODO das hier ist noch komisch
+					int xCheckTile = (mouseX + offsetX) / tileWidth;
+					if ((xCheckTile < maxWidthIndex) && (mouseX >= 0) && (tiles[xCheckTile][staticTileYIndex] == null
+							|| tiles[xCheckTile][staticTileYIndex] == currentMovingTile)) {
+						currentMovingTile.setX(e.getX());
+						tp.repaint();
+					}
 				}
-			}
-			if (currentMovingTile.getMoveState() == Tile.Y_MOVEABLE) {
-				int mouseY = e.getY();
-				int staticTileXIndex = currentMovingTile.getX() / tileWidth;
-				int offsetY = mouseY < currentMovingTile.getY() ? -1 : tileHeight; // TODO das hier ist noch komisch
-				int yCheckTile = (mouseY + offsetY) / tileHeight;
-				if ((yCheckTile < maxHeightIndex) && (mouseY >= 0) && (tiles[staticTileXIndex][yCheckTile] == null
-						|| tiles[staticTileXIndex][yCheckTile] == currentMovingTile)) {
-					currentMovingTile.setY(e.getY());
-					tp.repaint();
+				if (currentMovingTile.getMoveState() == Tile.Y_MOVEABLE) {
+					int mouseY = e.getY();
+					int staticTileXIndex = currentMovingTile.getX() / tileWidth;
+					int offsetY = mouseY < currentMovingTile.getY() ? -1 : tileHeight; // TODO das hier ist noch komisch
+					int yCheckTile = (mouseY + offsetY) / tileHeight;
+					if ((yCheckTile < maxHeightIndex) && (mouseY >= 0) && (tiles[staticTileXIndex][yCheckTile] == null
+							|| tiles[staticTileXIndex][yCheckTile] == currentMovingTile)) {
+						currentMovingTile.setY(e.getY());
+						tp.repaint();
+					}
 				}
+				tp.repaint();
 			}
-			tp.repaint();
 		}
 	}
 

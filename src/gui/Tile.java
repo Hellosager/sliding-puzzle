@@ -20,6 +20,13 @@ public class Tile {
 		this.id = id;
 	}
 	
+	public Tile(Tile t) {
+		this.tilePic = t.tilePic;
+		this.x = t.x;
+		this.y = t.y;
+		this.id = t.id;
+	}
+	
 	public BufferedImage getImage() {
 		return tilePic;
 	}

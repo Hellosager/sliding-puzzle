@@ -44,34 +44,40 @@ public class TileClickListener implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		int x = e.getX() / tileWidth;
-		int y = e.getY() / tileHeight;
-		tpl.setCurrentMovingTile(mixedTiles[x][y]);
-		oldXIndex = x;
-		oldYIndex = y;
+		if(!tp.isSolved() && !tp.isShowingOriginalPicture()) {
+			int x = e.getX() / tileWidth;
+			int y = e.getY() / tileHeight;
+			tpl.setCurrentMovingTile(mixedTiles[x][y]);
+			oldXIndex = x;
+			oldYIndex = y;
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Tile currentMovingTile = tpl.getCurrentMovingTile();
-		if (currentMovingTile != null) {
-			int x = (currentMovingTile.getX() + tileWidth / 2) / tileWidth;
-			int y = (currentMovingTile.getY() + tileHeight / 2) / tileHeight;
-			currentMovingTile.setX(x * tileWidth);
-			currentMovingTile.setY(y * tileHeight);
-			if (currentMovingTile != mixedTiles[x][y]) {
-				mixedTiles[x][y] = currentMovingTile;
-				mixedTiles[oldXIndex][oldYIndex] = null;
-				updateMoveablesFromTile(oldXIndex, oldYIndex, x, y); // altes alle not null moveable, neues alle not
-																		// null not moveable
-				if (finished()) {
-					System.out.println("GEWONNEN DU FFFFFFAGOTT");
+		if(!tp.isSolved() && !tp.isShowingOriginalPicture()) {
+			Tile currentMovingTile = tpl.getCurrentMovingTile();
+			if (currentMovingTile != null) {
+				int x = (currentMovingTile.getX() + tileWidth / 2) / tileWidth;
+				int y = (currentMovingTile.getY() + tileHeight / 2) / tileHeight;
+				currentMovingTile.setX(x * tileWidth);
+				currentMovingTile.setY(y * tileHeight);
+				if (currentMovingTile != mixedTiles[x][y]) {
+					mixedTiles[x][y] = currentMovingTile;
+					mixedTiles[oldXIndex][oldYIndex] = null;
+					updateMoveablesFromTile(oldXIndex, oldYIndex, x, y); // altes alle not null moveable, neues alle not
+					// null not moveable
+					if (finished()) {
+						tp.setSolved(true);
+						tp.repaint();
+						System.out.println("GEWONNEN DU FFFFFFAGOTT");
+					}
 				}
+				oldXIndex = -1;
+				oldYIndex = -1;
+				tpl.setCurrentMovingTile(null);
+				tp.repaint();
 			}
-			oldXIndex = -1;
-			oldYIndex = -1;
-			tpl.setCurrentMovingTile(null);
-			tp.repaint();
 		}
 	}
 

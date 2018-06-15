@@ -8,20 +8,20 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import gui.GameFrame;
 import gui.MainPanel;
 
 public class ImagePreviewListener extends MouseAdapter {
 	private JLabel preview;
-	private GameFrame gf;
+	private JFrame frame;
 	private MainPanel mp;
 	private double screenWidth, screenHeight;
 	
-	public ImagePreviewListener(JLabel preview, GameFrame gf, MainPanel mp) {
+	public ImagePreviewListener(JLabel preview, JFrame frame, MainPanel mp) {
 		this.preview = preview;
-		this.gf = gf;
+		this.frame = frame;
 		this.mp = mp;
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		screenWidth = screenSize.getWidth();
@@ -30,7 +30,7 @@ public class ImagePreviewListener extends MouseAdapter {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		FileDialog fd = new FileDialog(gf.getFrame(), "Load Picture" ,FileDialog.LOAD);
+		FileDialog fd = new FileDialog(frame, "Load Picture" ,FileDialog.LOAD);
 		fd.setDirectory("C:\\");
 		fd.setVisible(true);
 		if(fd.getFile() != null) {
@@ -50,8 +50,8 @@ public class ImagePreviewListener extends MouseAdapter {
 			preview.setIcon(icon);
 			preview.setText(null);
 			preview.setPreferredSize(null);
-			gf.getFrame().pack();
-			gf.getFrame().setLocationRelativeTo(null);
+			frame.pack();
+			frame.setLocationRelativeTo(null);
 		}
 	}
 }
