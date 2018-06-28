@@ -27,7 +27,7 @@ public class PanelKeyListener implements KeyListener {
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+		if(e.getKeyCode() == KeyEvent.VK_SPACE && !tp.isSolved()) {
 			tp.setShowingOriginalPicture(false);
 			tp.repaint();
 		}
