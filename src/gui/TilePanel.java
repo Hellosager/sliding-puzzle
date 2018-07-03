@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -13,6 +14,8 @@ import controller.TilePushListener;
 import utils.ImageScaler;
 
 public class TilePanel extends JPanel {
+	private static final String ESCAPE = "ESC";
+	
 	private int tileWidht, tileHeight;
 	private Tile originalTiles[][];
 	private Tile mixedTiles[][];
@@ -150,13 +153,14 @@ public class TilePanel extends JPanel {
 		super.paintComponent(g);
 		if(!solved && !showingOriginalPicture) {
 			System.out.println("mixed");
-			for (int i = 0; i < mixedTiles.length; i++) {
-				for (int j = 0; j < mixedTiles[i].length; j++) {
-					if (mixedTiles[i][j] != null) {
-						g.drawImage(mixedTiles[i][j].getImage(), mixedTiles[i][j].getX(), mixedTiles[i][j].getY(), null);
-					}
-				}
-			}
+//			for (int i = 0; i < mixedTiles.length; i++) {
+//				for (int j = 0; j < mixedTiles[i].length; j++) {
+//					if (mixedTiles[i][j] != null) {
+//						g.drawImage(mixedTiles[i][j].getImage(), mixedTiles[i][j].getX(), mixedTiles[i][j].getY(), null);
+//					}
+//				}
+//			}
+			renderTiles(g, mixedTiles);
 			g.setColor(Color.RED);
 			int i = 0;
 			int j = 0;
@@ -166,19 +170,37 @@ public class TilePanel extends JPanel {
 			while ((j += tileHeight) < getHeight()) {
 				g.drawLine(0, j, getWidth(), j);
 			}
-		}else {
+		}else if(!solved && showingOriginalPicture){
 			System.out.println("orig paint");
-			for(int i = 0; i < originalTiles.length; i++) {
-				for(int j = 0; j < originalTiles[i].length; j++) {
-					if(originalTiles[i][j] != null) {
-						Tile tile = originalTiles[i][j];
-						g.drawImage(tile.getImage(), tile.getX(), tile.getY(), null);
-					}
+//			for(int i = 0; i < originalTiles.length; i++) {
+//				for(int j = 0; j < originalTiles[i].length; j++) {
+//					if(originalTiles[i][j] != null) {
+//						Tile tile = originalTiles[i][j];
+//						g.drawImage(tile.getImage(), tile.getX(), tile.getY(), null);
+//					}
+//				}
+//			}
+			renderTiles(g, originalTiles);
+		}else if(solved) {
+			g.setColor(Color.RED);
+			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30 ));
+			int stringWidht = g.getFontMetrics().stringWidth(ESCAPE);
+			g.drawString(ESCAPE, ((mixedTiles.length-1) * tileWidht) + tileWidht/2 - stringWidht/2, tileHeight/2);
+			renderTiles(g, mixedTiles);
+		}
+	}
+
+	private void renderTiles(Graphics g, Tile[][] tilesToPaint) {
+		for(int i = 0; i < tilesToPaint.length; i++) {
+			for(int j = 0; j < tilesToPaint[i].length; j++) {
+				if(tilesToPaint[i][j] != null) {
+					Tile tile = tilesToPaint[i][j];
+					g.drawImage(tile.getImage(), tile.getX(), tile.getY(), null);
 				}
 			}
 		}
 	}
-
+	
 	public int getTileWidth() {
 		return tileWidht;
 	}
