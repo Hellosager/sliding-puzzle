@@ -1,5 +1,6 @@
 package controller;
 
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
@@ -12,6 +13,8 @@ public class TilePushListener implements MouseMotionListener {
 	private int tileWidth, tileHeight;
 	private Tile[][] tiles;
 	private int maxWidthIndex, maxHeightIndex;
+	private int baseXEmptyTile, baseYEmptyTile;
+	private boolean mouseCampingEsc;
 
 	public TilePushListener(TilePanel tp, int tileWidth, int tileHeight, Tile[][] tiles) {
 		this.tp = tp;
@@ -20,6 +23,9 @@ public class TilePushListener implements MouseMotionListener {
 		this.tiles = tiles;
 		this.maxWidthIndex = tiles.length;
 		this.maxHeightIndex = tiles[0].length;
+		mouseCampingEsc = false;
+		baseXEmptyTile = (maxWidthIndex-1)*tileWidth;
+		baseYEmptyTile = 1*tileHeight;
 	}
 
 	@Override
@@ -55,8 +61,24 @@ public class TilePushListener implements MouseMotionListener {
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent arg0) {
-
+	public void mouseMoved(MouseEvent e) {
+		if(tp.isSolved()) {
+			int x = e.getX();
+			int y = e.getY();
+			if(((x >= baseXEmptyTile) && (x <= baseXEmptyTile + tileWidth)) && (((y >= 0) && (y <= baseYEmptyTile)))) {	// hover on ESC tile
+				if(!mouseCampingEsc) {
+					tp.setCurrentEndForeground(Color.RED);
+					mouseCampingEsc = true;
+					tp.repaint();
+				}
+			}else{
+				if(mouseCampingEsc) {
+					tp.setCurrentEndForeground(Color.BLACK);
+					mouseCampingEsc = false;
+					tp.repaint();
+				}
+			}
+		}
 	}
 
 	public void setCurrentMovingTile(Tile tile) {

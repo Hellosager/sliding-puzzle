@@ -21,6 +21,9 @@ public class TilePanel extends JPanel {
 	private Tile mixedTiles[][];
 	private boolean showingOriginalPicture;
 	private boolean solved;
+	
+	private Font escapeFont;
+	private Color currentEndForeground;
 
 	public TilePanel(BufferedImage srcPic, int widthTiles, int heightTiles) {
 		this.originalTiles = new Tile[widthTiles][heightTiles];
@@ -33,7 +36,8 @@ public class TilePanel extends JPanel {
 		tileWidht = roundDown(srcPicWidth, widthTiles);
 		tileHeight = roundDown(srcPicHeight, heightTiles);
 		setPreferredSize(new Dimension(tileWidht * widthTiles, tileHeight * heightTiles));
-
+		escapeFont = new Font(Font.SANS_SERIF, Font.BOLD, tileHeight / 4 ); 
+				
 		for (int i = 0; i < originalTiles.length; i++) {
 			for (int j = 0; j < originalTiles[i].length; j++) {
 				int x = i * tileWidht;
@@ -153,13 +157,6 @@ public class TilePanel extends JPanel {
 		super.paintComponent(g);
 		if(!solved && !showingOriginalPicture) {
 			System.out.println("mixed");
-//			for (int i = 0; i < mixedTiles.length; i++) {
-//				for (int j = 0; j < mixedTiles[i].length; j++) {
-//					if (mixedTiles[i][j] != null) {
-//						g.drawImage(mixedTiles[i][j].getImage(), mixedTiles[i][j].getX(), mixedTiles[i][j].getY(), null);
-//					}
-//				}
-//			}
 			renderTiles(g, mixedTiles);
 			g.setColor(Color.RED);
 			int i = 0;
@@ -172,20 +169,13 @@ public class TilePanel extends JPanel {
 			}
 		}else if(!solved && showingOriginalPicture){
 			System.out.println("orig paint");
-//			for(int i = 0; i < originalTiles.length; i++) {
-//				for(int j = 0; j < originalTiles[i].length; j++) {
-//					if(originalTiles[i][j] != null) {
-//						Tile tile = originalTiles[i][j];
-//						g.drawImage(tile.getImage(), tile.getX(), tile.getY(), null);
-//					}
-//				}
-//			}
 			renderTiles(g, originalTiles);
 		}else if(solved) {
-			g.setColor(Color.RED);
-			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30 ));
+			g.setFont(escapeFont);
+			g.setColor(currentEndForeground);
 			int stringWidht = g.getFontMetrics().stringWidth(ESCAPE);
-			g.drawString(ESCAPE, ((mixedTiles.length-1) * tileWidht) + tileWidht/2 - stringWidht/2, tileHeight/2);
+			int stringHeight = g.getFontMetrics().getHeight();
+			g.drawString(ESCAPE, ((mixedTiles.length-1) * tileWidht) + tileWidht/2 - stringWidht/2, tileHeight/2 + stringHeight/4);
 			renderTiles(g, mixedTiles);
 		}
 	}
@@ -223,5 +213,13 @@ public class TilePanel extends JPanel {
 	
 	public void setSolved(boolean b) {
 		this.solved = b;
+	}
+	
+	public void setCurrentEndForeground(Color c) {
+		this.currentEndForeground = c;
+	}
+	
+	public void setCurrentEndBeckground(Color c) {
+		this.currentEndForeground = c;
 	}
 }
