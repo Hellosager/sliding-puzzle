@@ -18,7 +18,6 @@ import javax.swing.JTextField;
 
 import controller.ImagePreviewListener;
 import controller.PanelKeyListener;
-import main.Game;
 
 public class MainPanel extends JPanel{
 	private JFrame frame;
@@ -27,10 +26,9 @@ public class MainPanel extends JPanel{
 	private JTextField tileCountField;
 	private JButton startGame;
 	
-	public MainPanel(JFrame frame) {
-		this.frame = frame;
+	public MainPanel(GameFrame gameFrame) {
 		setLayout(new BorderLayout());
-		
+		this.frame = gameFrame.getFrame();
 		imagePreview = new JLabel("Click", JLabel.CENTER);
 		imagePreview.addMouseListener(new ImagePreviewListener(imagePreview, frame, this));
 		imagePreview.setPreferredSize(new Dimension(350, 350));
@@ -53,9 +51,9 @@ public class MainPanel extends JPanel{
 				BufferedImage picture;
 				try {
 					picture = ImageIO.read(new File(currentPicturePath));
-					TilePanel tp = new TilePanel(picture, tileCount, tileCount);
+					TilePanel tp = new TilePanel(gameFrame, picture, tileCount, tileCount);
 					frame.getContentPane().removeAll();
-					tp.addKeyListener(new PanelKeyListener(tp, frame));
+					tp.addKeyListener(new PanelKeyListener(tp));
 					frame.add(tp);
 					tp.requestFocus();
 					frame.revalidate();

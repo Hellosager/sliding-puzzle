@@ -10,11 +10,9 @@ import gui.TilePanel;
 
 public class PanelKeyListener implements KeyListener {
 	private TilePanel tp;
-	private JFrame frame;
 	
-	public PanelKeyListener(TilePanel tp, JFrame frame) {
+	public PanelKeyListener(TilePanel tp) {
 		this.tp = tp;
-		this.frame = frame;
 	}
 
 	@Override
@@ -33,11 +31,7 @@ public class PanelKeyListener implements KeyListener {
 		}
 		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			System.out.println("ESCAPE JUNGE");
-			frame.getContentPane().removeAll();
-			frame.add(new MainPanel(frame));
-			frame.revalidate();
-			frame.pack();
-			frame.setLocationRelativeTo(null);
+			tp.getGameFrame().backToMenu();
 		}
 	}
 

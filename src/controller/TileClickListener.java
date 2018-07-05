@@ -3,10 +3,12 @@ package controller;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import gui.GameFrame;
 import gui.Tile;
 import gui.TilePanel;
 
 public class TileClickListener implements MouseListener {
+	private GameFrame gameFrame;
 	private TilePushListener tpl;
 	private TilePanel tp;
 	private int tileWidth, tileHeight;
@@ -17,6 +19,7 @@ public class TileClickListener implements MouseListener {
 	public TileClickListener(TilePushListener tpl, TilePanel tp, Tile[][] mixedTiles, Tile[][] originalTiles) {
 		this.tpl = tpl;
 		this.tp = tp;
+		this.gameFrame = tp.getGameFrame();
 		this.tileWidth = tp.getTileWidth();
 		this.tileHeight = tp.getTileHeight();
 		this.mixedTiles = mixedTiles;
@@ -78,6 +81,8 @@ public class TileClickListener implements MouseListener {
 				tpl.setCurrentMovingTile(null);
 				tp.repaint();
 			}
+		}else if(tp.isSolved() && tp.isPointOnEsc(e.getX(), e.getY())) {
+			gameFrame.backToMenu();
 		}
 	}
 

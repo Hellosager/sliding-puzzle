@@ -15,17 +15,20 @@ import utils.ImageScaler;
 
 public class TilePanel extends JPanel {
 	private static final String ESCAPE = "ESC";
-	
-	private int tileWidht, tileHeight;
+
+	private GameFrame gameFrame;
+	private int tileWidth, tileHeight;
 	private Tile originalTiles[][];
 	private Tile mixedTiles[][];
 	private boolean showingOriginalPicture;
 	private boolean solved;
 	
 	private Font escapeFont;
+	private int baseXEmptyTile, baseYEmptyTile;
 	private Color currentEndForeground;
 
-	public TilePanel(BufferedImage srcPic, int widthTiles, int heightTiles) {
+	public TilePanel(GameFrame gameFrame, BufferedImage srcPic, int widthTiles, int heightTiles) {
+		this.gameFrame = gameFrame;
 		this.originalTiles = new Tile[widthTiles][heightTiles];
 		BufferedImage fittingPic = scaleImageIfNecassary(srcPic);
 		this.showingOriginalPicture = false;
@@ -33,23 +36,26 @@ public class TilePanel extends JPanel {
 
 		int srcPicWidth = fittingPic.getWidth();
 		int srcPicHeight = fittingPic.getHeight();
-		tileWidht = roundDown(srcPicWidth, widthTiles);
+		tileWidth = roundDown(srcPicWidth, widthTiles);
 		tileHeight = roundDown(srcPicHeight, heightTiles);
-		setPreferredSize(new Dimension(tileWidht * widthTiles, tileHeight * heightTiles));
+		setPreferredSize(new Dimension(tileWidth * widthTiles, tileHeight * heightTiles));
 		escapeFont = new Font(Font.SANS_SERIF, Font.BOLD, tileHeight / 4 ); 
+		baseXEmptyTile = (widthTiles-1)*tileWidth;
+		baseYEmptyTile = 1*tileHeight;
+
 				
 		for (int i = 0; i < originalTiles.length; i++) {
 			for (int j = 0; j < originalTiles[i].length; j++) {
-				int x = i * tileWidht;
+				int x = i * tileWidth;
 				int y = j * tileHeight;
-				originalTiles[i][j] = new Tile(fittingPic.getSubimage(x, y, tileWidht, tileHeight), x, y,
+				originalTiles[i][j] = new Tile(fittingPic.getSubimage(x, y, tileWidth, tileHeight), x, y,
 						(i + 1) * (j + 1));
 				originalTiles[i][j].setMoveState(Tile.NOT_MOVEABLE);
 			}
 		}
 		originalTiles[widthTiles - 1][0] = null; // dynamic moveable sets around empty tile
 		this.mixedTiles = mixTiles(originalTiles);
-		TilePushListener tpl = new TilePushListener(this, tileWidht, tileHeight, mixedTiles);
+		TilePushListener tpl = new TilePushListener(this, tileWidth, tileHeight, mixedTiles);
 		addMouseListener(new TileClickListener(tpl, this, mixedTiles, originalTiles));
 		addMouseMotionListener(tpl);
 	}
@@ -102,7 +108,7 @@ public class TilePanel extends JPanel {
 					previousMove = move;
 					workingMixedTiles[nullTileX][nullTileY] = workingMixedTiles[newNullTileX][newNullTileY];
 					workingMixedTiles[newNullTileX][newNullTileY] = null;
-					workingMixedTiles[nullTileX][nullTileY].setX(nullTileX * tileWidht);
+					workingMixedTiles[nullTileX][nullTileY].setX(nullTileX * tileWidth);
 					workingMixedTiles[nullTileX][nullTileY].setY(nullTileY * tileHeight);
 				}
 			}
@@ -161,7 +167,7 @@ public class TilePanel extends JPanel {
 			g.setColor(Color.RED);
 			int i = 0;
 			int j = 0;
-			while ((i += tileWidht) < getWidth()) {
+			while ((i += tileWidth) < getWidth()) {
 				g.drawLine(i, 0, i, getHeight());
 			}
 			while ((j += tileHeight) < getHeight()) {
@@ -175,7 +181,7 @@ public class TilePanel extends JPanel {
 			g.setColor(currentEndForeground);
 			int stringWidht = g.getFontMetrics().stringWidth(ESCAPE);
 			int stringHeight = g.getFontMetrics().getHeight();
-			g.drawString(ESCAPE, ((mixedTiles.length-1) * tileWidht) + tileWidht/2 - stringWidht/2, tileHeight/2 + stringHeight/4);
+			g.drawString(ESCAPE, ((mixedTiles.length-1) * tileWidth) + tileWidth/2 - stringWidht/2, tileHeight/2 + stringHeight/4);
 			renderTiles(g, mixedTiles);
 		}
 	}
@@ -190,9 +196,13 @@ public class TilePanel extends JPanel {
 			}
 		}
 	}
+
+	public boolean isPointOnEsc(int x, int y) {
+		return ((x >= baseXEmptyTile) && (x <= baseXEmptyTile + tileWidth)) && (((y >= 0) && (y <= baseYEmptyTile)));
+	}
 	
 	public int getTileWidth() {
-		return tileWidht;
+		return tileWidth;
 	}
 
 	public int getTileHeight() {
@@ -221,5 +231,17 @@ public class TilePanel extends JPanel {
 	
 	public void setCurrentEndBeckground(Color c) {
 		this.currentEndForeground = c;
+	}
+
+	public int getBaseXEmptyTile() {
+		return baseXEmptyTile;
+	}
+
+	public int getBaseYEmptyTile() {
+		return baseYEmptyTile;
+	}
+	
+	public GameFrame getGameFrame() {
+		return gameFrame;
 	}
 }

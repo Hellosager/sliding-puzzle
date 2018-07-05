@@ -4,10 +4,12 @@ import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
+import gui.GameFrame;
 import gui.Tile;
 import gui.TilePanel;
 
 public class TilePushListener implements MouseMotionListener {
+	private GameFrame gameFrame;
 	private Tile currentMovingTile;
 	private TilePanel tp;
 	private int tileWidth, tileHeight;
@@ -18,6 +20,7 @@ public class TilePushListener implements MouseMotionListener {
 
 	public TilePushListener(TilePanel tp, int tileWidth, int tileHeight, Tile[][] tiles) {
 		this.tp = tp;
+		this.gameFrame = tp.getGameFrame();
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
 		this.tiles = tiles;
@@ -65,7 +68,7 @@ public class TilePushListener implements MouseMotionListener {
 		if(tp.isSolved()) {
 			int x = e.getX();
 			int y = e.getY();
-			if(((x >= baseXEmptyTile) && (x <= baseXEmptyTile + tileWidth)) && (((y >= 0) && (y <= baseYEmptyTile)))) {	// hover on ESC tile
+			if(tp.isPointOnEsc(x, y)) {	// hover on ESC tile
 				if(!mouseCampingEsc) {
 					tp.setCurrentEndForeground(Color.RED);
 					mouseCampingEsc = true;
