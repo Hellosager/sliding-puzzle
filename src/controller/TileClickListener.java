@@ -73,7 +73,6 @@ public class TileClickListener implements MouseListener {
 					if (finished()) {
 						tp.setSolved(true);
 						tp.repaint();
-						System.out.println("GEWONNEN DU FFFFFFAGOTT");
 					}
 				}
 				oldXIndex = -1;

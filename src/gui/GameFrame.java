@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 public class GameFrame {
 	private JFrame frame;
 	
-	public GameFrame(BufferedImage originalPic) {
+	public GameFrame() {
 		frame = new JFrame("Schieberätsel");
 		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

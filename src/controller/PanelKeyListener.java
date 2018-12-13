@@ -30,7 +30,6 @@ public class PanelKeyListener implements KeyListener {
 			tp.repaint();
 		}
 		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			System.out.println("ESCAPE JUNGE");
 			tp.getGameFrame().backToMenu();
 		}
 	}

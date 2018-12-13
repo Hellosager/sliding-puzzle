@@ -162,7 +162,6 @@ public class TilePanel extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if(!solved && !showingOriginalPicture) {
-			System.out.println("mixed");
 			renderTiles(g, mixedTiles);
 			g.setColor(Color.RED);
 			int i = 0;
@@ -174,7 +173,6 @@ public class TilePanel extends JPanel {
 				g.drawLine(0, j, getWidth(), j);
 			}
 		}else if(!solved && showingOriginalPicture){
-			System.out.println("orig paint");
 			renderTiles(g, originalTiles);
 		}else if(solved) {
 			g.setFont(escapeFont);
